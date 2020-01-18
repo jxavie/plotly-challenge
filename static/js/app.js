@@ -112,7 +112,9 @@ d3.json(datasource).then((dataset) => {
         var data = [trace];
 
         layout = {
-            title: "Top 10 OTUs"
+            title: "<b>Top 10 OTUs</b>",
+            xaxis: {title: "Sample Value"},
+            yaxis: {title: "OTU ID"}
         };
 
         Plotly.newPlot("bar", data, layout);
@@ -125,14 +127,19 @@ d3.json(datasource).then((dataset) => {
             y: selSamples,
             text: selLabels,
             mode: "markers",
-            marker: {size: selSamples}
+            marker: {
+                size: selSamples,
+                color: selIDs,
+                colorscale: "Earth"
+            }
         };
 
         var data = [trace];
 
         layout = {
-            // title: "Top 10 OTUs",
-            xaxis: {title: "OTU ID"}
+            title: "<b>Sample Values vs. OTU ID</b>",
+            xaxis: {title: "OTU ID"},
+            yaxis: {title: "Sample Value"}
         };
 
         Plotly.newPlot("bubble", data, layout);
@@ -168,12 +175,12 @@ function optionChanged(selection){
         };
 
         // use filter function to extract metadata object for selected id
-        results_demo = demographics.filter(selFilter);
-        console.log(results_demo);
+        selDemo = demographics.filter(selFilter);
+        console.log(selDemo);
 
         // create arrays of keys and values in metadata object
-        var demo_keys = Object.keys(results_demo[0]);
-        var demo_values = Object.values(results_demo[0]);
+        var demo_keys = Object.keys(selDemo[0]);
+        var demo_values = Object.values(selDemo[0]);
 
         // create an array of key-value pairs for dashboard
         var demo_entries = [];
@@ -185,14 +192,14 @@ function optionChanged(selection){
         console.log(demo_entries);
 
         // bind key-value pair data to list tags
-        selDemo = demo_div.select("ul")
+        var ul = demo_div.select("ul")
             .selectAll("li")
             .data(demo_entries);
 
         // append list tags to html
-        selDemo.enter()
+        ul.enter()
             .append("li")
-            .merge(selDemo)
+            .merge(ul)
             .text((d) => d);
 
         // assign dataset samples array to variable
@@ -246,6 +253,11 @@ function optionChanged(selection){
         Plotly.restyle("bubble", "y", [selSamples]);
         Plotly.restyle("bubble", "text", [selLabels]);
         Plotly.restyle("bubble", "size", [selSamples]);
+        Plotly.restyle("bubble", "color", [selIDs]);
+
+        // render gauge by calling function from bonus.js
+        console.log(selDemo[0].wfreq);
+        displayGauge(selDemo[0].wfreq);
 
     });
 
